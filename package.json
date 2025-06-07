@@ -12,6 +12,8 @@
   "dependencies": {
     "bootstrap": "^5.3.6",
     "fabric": "^6.7.0",
+    "html2canvas": "^1.4.1",
+    "lucide-react": "^0.513.0",
     "react": "^19.1.0",
     "react-bootstrap": "^2.10.10",
     "react-dom": "^19.1.0"

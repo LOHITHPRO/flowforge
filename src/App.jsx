@@ -1,17 +1,14 @@
-import './App.css'
-import Header from './components/header/header'
+// App.jsx
 
-import Draw from './components/draw/draw'
+import './App.css';
+import Header from './components/header/Header';
+import Draw from './components/draw/Draw';
 
 function App() {
   return (
-    <div>
-      <div className='d-flex align-items-center'>
-        <Header />
-          <div>
-            <Draw />
-          </div>
-      </div>
+    <div className="w-100">
+      <Header />
+      <Draw />
     </div>
   );
 }

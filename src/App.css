@@ -1,3 +1,10 @@
-.h1{
-    color: red;
-}
+body {
+    background-color: #1e1e2f;
+    color: #fff;
+    font-family: 'Segoe UI', sans-serif;
+  }
+  
+  canvas {
+    touch-action: none; /* For mobile drawing support */
+  }
+  
