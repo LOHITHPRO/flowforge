@@ -1,4 +1,5 @@
 import React, { useRef, useState, useEffect } from "react";
+import Type from '../type/type';
 
 const Draw = () => {
   const canvasRef = useRef(null);
@@ -11,22 +12,31 @@ const Draw = () => {
   const [shape, setShape] = useState("freehand");
   const [startPos, setStartPos] = useState(null);
 
+  // Responsive canvas dimensions
+  const [canvasDims, setCanvasDims] = useState({
+    width: Math.floor(window.innerWidth * 0.75),
+    height: Math.floor(window.innerHeight * 0.75)
+  });
+
+  useEffect(() => {
+    const handleResize = () => {
+      setCanvasDims({
+        width: Math.floor(window.innerWidth * 0.75),
+        height: Math.floor(window.innerHeight * 0.75)
+      });
+    };
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
   useEffect(() => {
     const canvas = canvasRef.current;
-    // Set canvas size to 75% of the window's width and height (with a max height for usability)
-    const width = Math.floor(window.innerWidth * 0.75);
-    const height = Math.floor(window.innerHeight * 0.75);
-    canvas.width = width;
-    canvas.height = height;
-    canvas.style.width = width + "px";
-    canvas.style.height = height + "px";
-    canvas.style.border = "2px solid #333";
     const ctx = canvas.getContext("2d");
     ctx.lineCap = "round";
     ctx.strokeStyle = penColor;
     ctx.lineWidth = penSize;
     ctxRef.current = ctx;
-  }, [penColor, penSize]);
+  }, [penColor, penSize, canvasDims]);
 
   // Drawing handlers
   const startDraw = (e) => {
@@ -89,13 +99,12 @@ const Draw = () => {
   };
 
   return (
-    <div className="container text-center mt-4">
-      <h3 className="text-primary">Canvas Drawing Board</h3>
+    <div className="container mt-4">
+      <h3 className="text-primary text-center">Canvas Drawing Board</h3>
       {/* Navbar-like controls */}
       <div className="d-flex justify-content-center align-items-center mb-3" style={{ gap: "1rem" }}>
-        {/* Shapes Dropdown */}
         <div>
-          <label htmlFor="shape-select" className="me-2">Shape:</label>
+          <label htmlFor="shape-select" className="me-2 text-white">Shape:</label>
           <select
             id="shape-select"
             className="form-select d-inline-block w-auto"
@@ -108,9 +117,8 @@ const Draw = () => {
             <option value="circle">Circle</option>
           </select>
         </div>
-        {/* Pen Size Dropdown */}
         <div>
-          <label htmlFor="pen-size-select" className="me-2">Pen Size:</label>
+          <label htmlFor="pen-size-select" className="me-2 text-white">Pen Size:</label>
           <select
             id="pen-size-select"
             className="form-select d-inline-block w-auto"
@@ -123,9 +131,8 @@ const Draw = () => {
             <option value="12">12px</option>
           </select>
         </div>
-        {/* Color Dropdown */}
         <div>
-          <label htmlFor="color-select" className="me-2">Color:</label>
+          <label htmlFor="color-select" className="me-2 text-white">Color:</label>
           <select
             id="color-select"
             className="form-select d-inline-block w-auto"
@@ -140,16 +147,38 @@ const Draw = () => {
           </select>
         </div>
       </div>
-      {/* Canvas */}
-      <canvas
-        ref={canvasRef}
-        onMouseDown={startDraw}
-        onMouseMove={drawing}
-        onMouseUp={stopDraw}
-        onMouseLeave={stopDraw}
-        style={{ background: "#fff", cursor: "crosshair", display: "block", margin: "0 auto" }}
-      />
-      <div className="mt-3">
+      {/* Flex container for canvas and notebook */}
+      <div style={{ display: "flex", width: "100%", minHeight: "75vh" }}>
+        {/* Canvas section */}
+        <div style={{ width: "75%", display: "flex", justifyContent: "flex-start" }}>
+          <canvas
+            ref={canvasRef}
+            width={canvasDims.width}
+            height={canvasDims.height}
+            onMouseDown={startDraw}
+            onMouseMove={drawing}
+            onMouseUp={stopDraw}
+            onMouseLeave={stopDraw}
+            style={{
+              background: "#7d7979",
+              cursor: "crosshair",
+              border: "2px solid #333",
+              display: "block"
+            }}
+          />
+        </div>
+        {/* Notebook placeholder */}
+        <div style={{
+          width: "25%",
+          borderLeft: "1px solid #ccc",
+          padding: "1rem",
+          minHeight: "70vh",
+          background: "#fafafa"
+        }}>
+          <Type />
+        </div>
+      </div>
+      <div className="mt-3 text-center">
         <button className="btn btn-danger me-2" onClick={clearCanvas}>Clear</button>
       </div>
     </div>
