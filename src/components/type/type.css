@@ -1,0 +1,177 @@
+.notebook-wrapper {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 20px;
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.notebook-title {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  font-size: 1.5rem;
+  font-weight: bold;
+  margin-bottom: 1.5rem;
+  color: #333;
+}
+
+.formatting-toolbar {
+  display: flex;
+  gap: 8px;
+  padding: 8px;
+  background: #f8f9fa;
+  border: 1px solid #dee2e6;
+  border-radius: 4px;
+  margin-bottom: 1rem;
+  align-items: center;
+}
+
+.format-btn {
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: white;
+  border: 1px solid #dee2e6;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: all 0.2s ease;
+  color: #333 !important;
+  font-size: 1rem !important;
+}
+
+.format-btn:hover {
+  background: #e9ecef;
+  transform: translateY(-1px);
+}
+
+.color-picker {
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  border: 1px solid #dee2e6;
+  border-radius: 4px;
+  cursor: pointer;
+  background: white;
+}
+
+.color-picker::-webkit-color-swatch-wrapper {
+  padding: 0;
+}
+
+.color-picker::-webkit-color-swatch {
+  border: none;
+  border-radius: 2px;
+}
+
+.notebook-editor {
+  min-height: 60vh;
+  padding: 1rem;
+  border: 1px solid #dee2e6;
+  border-radius: 4px;
+  background: #fff;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  font-size: 1.1rem;
+  line-height: 1.6;
+  outline: none;
+  overflow-y: auto;
+  background-image: linear-gradient(#eee 0.1em, transparent 0.1em);
+  background-size: 100% 1.6em;
+  color: #000000 !important;
+  direction: ltr !important;
+  unicode-bidi: unset !important;
+  position: relative;
+  text-align: left !important;
+}
+
+.notebook-editor:focus {
+  border-color: #80bdff;
+  box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+}
+
+.notebook-editor::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  background: #ff6b6b;
+  opacity: 0.5;
+  z-index: 1;
+}
+
+.notebook-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid #dee2e6;
+}
+
+.clear-btn {
+  padding: 0.5rem 1rem;
+  background: #6c757d;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.clear-btn:hover {
+  background: #5a6268;
+}
+
+.save-status {
+  color: #6c757d;
+  font-size: 0.875rem;
+}
+
+.notebook-editor strong {
+  font-weight: bold;
+  color: inherit;
+}
+
+.notebook-editor em {
+  font-style: italic;
+  color: inherit;
+}
+
+.notebook-editor u {
+  text-decoration: underline;
+  color: inherit;
+}
+
+.notebook-editor [style*="background-color"] {
+  background-color: #ffeb3b !important;
+  padding: 0 2px;
+  color: inherit;
+}
+
+/* Ensure formatting buttons are visible */
+.formatting-toolbar .format-btn {
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: white;
+  border: 1px solid #dee2e6;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: all 0.2s ease;
+  color: #333 !important; /* Force button text color */
+  font-size: 1rem !important; /* Force button text size */
+  line-height: 1; /* Adjust line height for better centering */
+  text-align: center; /* Center the text */
+}
+
+.formatting-toolbar .format-btn:hover {
+  background: #e9ecef;
+  transform: translateY(-1px);
+}

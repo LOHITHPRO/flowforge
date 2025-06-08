@@ -1,10 +1,18 @@
 body {
     background-color: #1e1e2f;
     color: #fff;
-    font-family: 'Segoe UI', sans-serif;
+    font-family: monospace; /* Set font to monospace */
+    font-style: italic;   /* Set font style to italic */
+    margin: 0; /* Remove default body margin */
+    padding: 0; /* Remove default body padding */
   }
   
   canvas {
     touch-action: none; /* For mobile drawing support */
+  }
+  
+  .main-content {
+    /* Removed margin-left as the menu will now overlay */
+    padding-top: 56px; /* Adjust based on Header height if fixed-top */
   }
   

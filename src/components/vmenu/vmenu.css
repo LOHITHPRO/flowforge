@@ -1,0 +1,58 @@
+.vmenu-container {
+  width: 200px;
+  background-color: #333;
+  color: #fff;
+  height: 100vh;
+  position: fixed;
+  left: -200px; /* Hidden off-screen */
+  top: 0;
+  padding-top: 20px;
+  transition: left 0.3s ease; /* Smooth slide effect */
+  z-index: 1000; /* Ensure it's above other content */
+}
+
+.vmenu-container.vmenu-open {
+  left: 0; /* Visible on-screen */
+}
+
+.vmenu-toggle {
+  position: fixed;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  background-color: #333;
+  color: #fff;
+  border: none;
+  padding: 10px 5px 10px 15px;
+  cursor: pointer;
+  z-index: 1001; /* Above the menu */
+  border-radius: 0 5px 5px 0;
+  font-size: 1.5rem;
+  transition: left 0.3s ease;
+}
+
+.vmenu-toggle.vmenu-open {
+  left: 200px; /* Move toggle button with the menu */
+}
+
+.vmenu-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.vmenu-item {
+  margin-bottom: 10px;
+}
+
+.vmenu-link {
+  display: block;
+  padding: 10px 15px;
+  color: #fff;
+  text-decoration: none;
+  transition: background-color 0.3s ease;
+}
+
+.vmenu-link:hover {
+  background-color: #555;
+} 

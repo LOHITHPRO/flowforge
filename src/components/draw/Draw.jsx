@@ -1,7 +1,6 @@
 // components/draw/Draw.jsx
 
 import React, { useRef, useState, useEffect } from "react";
-import Type from "../type/Type";
 
 const Draw = () => {
   const canvasRef = useRef(null);
@@ -179,7 +178,7 @@ const Draw = () => {
           padding: "1rem",
           overflowY: "auto"
         }}>
-          <Type />
+          {/* <Type /> - Removed duplicate rendering */}
         </div>
       </div>
 
