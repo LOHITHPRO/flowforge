@@ -13,8 +13,8 @@ function App() {
       <VMenu />
       <div className="main-content">
         <Draw />
-        <Type />
       </div>
+      <Type />
     </div>
   );
 }

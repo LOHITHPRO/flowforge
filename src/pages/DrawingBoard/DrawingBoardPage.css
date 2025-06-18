@@ -1,0 +1,38 @@
+.drawing-board-page {
+  padding: 2rem;
+  background-color: #000000;
+  min-height: 100vh;
+  color: #ffffff;
+  font-family: monospace;
+  font-style: italic;
+}
+
+.page-header {
+  margin-bottom: 2rem;
+}
+
+.page-header h1 {
+  font-size: 2rem;
+  font-weight: bold;
+  margin-bottom: 0.5rem;
+  color: #ffffff;
+}
+
+.page-header p {
+  font-size: 1.1rem;
+  margin-bottom: 0;
+  color: #ff0000;
+}
+
+.drawing-board-container {
+  background-color: #333333;
+  border: 1px solid #555555;
+  border-radius: 8px;
+  min-height: calc(100vh - 200px);
+  padding: 1rem;
+}
+
+.drawing-board-container:hover {
+  border-color: #ff0000;
+} 
+ 

@@ -1,38 +1,18 @@
 .vmenu-container {
-  width: 200px;
-  background-color: #333;
-  color: #fff;
-  height: 100vh;
   position: fixed;
-  left: -200px; /* Hidden off-screen */
-  top: 0;
-  padding-top: 20px;
-  transition: left 0.3s ease; /* Smooth slide effect */
-  z-index: 1000; /* Ensure it's above other content */
-}
-
-.vmenu-container.vmenu-open {
-  left: 0; /* Visible on-screen */
-}
-
-.vmenu-toggle {
-  position: fixed;
+  top: 56px; /* Adjust based on header height */
   left: 0;
-  top: 50%;
-  transform: translateY(-50%);
-  background-color: #333;
-  color: #fff;
-  border: none;
-  padding: 10px 5px 10px 15px;
-  cursor: pointer;
-  z-index: 1001; /* Above the menu */
-  border-radius: 0 5px 5px 0;
-  font-size: 1.5rem;
-  transition: left 0.3s ease;
+  height: calc(100vh - 56px);
+  background-color: #000000;
+  border-right: 1px solid #555555;
+  transform: translateX(-100%);
+  transition: transform 0.3s ease-in-out;
+  z-index: 1000;
+  width: 250px;
 }
 
-.vmenu-toggle.vmenu-open {
-  left: 200px; /* Move toggle button with the menu */
+.vmenu-open {
+  transform: translateX(0);
 }
 
 .vmenu-list {
@@ -42,17 +22,40 @@
 }
 
 .vmenu-item {
-  margin-bottom: 10px;
+  padding: 1rem;
+  border-bottom: 1px solid #555555;
 }
 
 .vmenu-link {
-  display: block;
-  padding: 10px 15px;
-  color: #fff;
+  color: #ffffff;
   text-decoration: none;
-  transition: background-color 0.3s ease;
+  font-family: monospace;
+  font-style: italic;
+  display: block;
+  transition: color 0.2s ease-in-out;
 }
 
 .vmenu-link:hover {
-  background-color: #555;
+  color: #ff0000;
+}
+
+.vmenu-toggle {
+  position: fixed;
+  top: 70px;
+  left: 0;
+  background-color: #333333;
+  color: #ffffff;
+  border: 1px solid #555555;
+  border-left: none;
+  padding: 0.5rem;
+  cursor: pointer;
+  z-index: 1001;
+  font-family: monospace;
+  font-style: italic;
+  transition: all 0.2s ease-in-out;
+}
+
+.vmenu-toggle:hover {
+  background-color: #555555;
+  color: #ff0000;
 } 

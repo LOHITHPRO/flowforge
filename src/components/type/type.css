@@ -1,26 +1,36 @@
 .notebook-wrapper {
   max-width: 800px;
-  margin: 0 auto;
-  padding: 20px;
-  background: #fff;
+  width: 350px; /* Define a specific width for the side panel */
+  background: #1a1a1a; /* Dark background for Forge Book */
   border-radius: 8px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5); /* Darker shadow */
+  position: fixed;
+  right: -350px; /* Hidden off-screen to the right */
+  top: 0;
+  height: 100vh; /* Full height */
+  padding: 20px;
+  transition: right 0.3s ease; /* Smooth slide effect */
+  z-index: 1000; /* Ensure it's above other content */
+}
+
+.notebook-wrapper.forge-book-open {
+  right: 0; /* Visible on-screen */
 }
 
 .notebook-title {
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  font-family: monospace;
   font-size: 1.5rem;
   font-weight: bold;
   margin-bottom: 1.5rem;
-  color: #333;
+  color: #ffffff; /* White title text */
 }
 
 .formatting-toolbar {
   display: flex;
   gap: 8px;
   padding: 8px;
-  background: #f8f9fa;
-  border: 1px solid #dee2e6;
+  background: #333333; /* Dark grey for toolbar background */
+  border: 1px solid #555555;
   border-radius: 4px;
   margin-bottom: 1rem;
   align-items: center;
@@ -32,29 +42,31 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: white;
-  border: 1px solid #dee2e6;
+  background: #333333; /* Dark grey button background */
+  border: 1px solid #555555;
   border-radius: 4px;
   cursor: pointer;
   font-weight: bold;
   transition: all 0.2s ease;
-  color: #333 !important;
+  color: #ffffff !important; /* White button text */
   font-size: 1rem !important;
+  line-height: 1;
+  text-align: center;
 }
 
 .format-btn:hover {
-  background: #e9ecef;
-  transform: translateY(-1px);
+  background: #ff0000; /* Red on hover */
+  color: #ffffff !important;
 }
 
 .color-picker {
   width: 32px;
   height: 32px;
   padding: 0;
-  border: 1px solid #dee2e6;
+  border: 1px solid #555555;
   border-radius: 4px;
   cursor: pointer;
-  background: white;
+  background: #333333; /* Dark grey background for picker */
 }
 
 .color-picker::-webkit-color-swatch-wrapper {
@@ -69,17 +81,18 @@
 .notebook-editor {
   min-height: 60vh;
   padding: 1rem;
-  border: 1px solid #dee2e6;
+  border: 1px solid #555555;
   border-radius: 4px;
-  background: #fff;
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background: #000000; /* Black background for editor */
+  font-family: monospace; /* Ensure monospace for editor content */
+  font-style: italic; /* Ensure italic for editor content */
   font-size: 1.1rem;
   line-height: 1.6;
   outline: none;
   overflow-y: auto;
-  background-image: linear-gradient(#eee 0.1em, transparent 0.1em);
+  background-image: linear-gradient(#333333 0.1em, transparent 0.1em); /* Darker lines */
   background-size: 100% 1.6em;
-  color: #000000 !important;
+  color: #ffffff !important; /* White text for editor */
   direction: ltr !important;
   unicode-bidi: unset !important;
   position: relative;
@@ -87,8 +100,8 @@
 }
 
 .notebook-editor:focus {
-  border-color: #80bdff;
-  box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+  border-color: #ff0000;
+  box-shadow: 0 0 0 0.2rem rgba(255, 0, 0, 0.25);
 }
 
 .notebook-editor::before {
@@ -98,8 +111,8 @@
   top: 0;
   bottom: 0;
   width: 2px;
-  background: #ff6b6b;
-  opacity: 0.5;
+  background: #ff0000; /* Red line */
+  opacity: 0.7;
   z-index: 1;
 }
 
@@ -109,12 +122,12 @@
   align-items: center;
   margin-top: 1rem;
   padding-top: 1rem;
-  border-top: 1px solid #dee2e6;
+  border-top: 1px solid #555555;
 }
 
 .clear-btn {
   padding: 0.5rem 1rem;
-  background: #6c757d;
+  background: #ff0000; /* Red clear button */
   color: white;
   border: none;
   border-radius: 4px;
@@ -123,14 +136,15 @@
 }
 
 .clear-btn:hover {
-  background: #5a6268;
+  background: #cc0000; /* Darker red on hover */
 }
 
 .save-status {
-  color: #6c757d;
+  color: #ffffff; /* White save status text */
   font-size: 0.875rem;
 }
 
+/* Formatting styles */
 .notebook-editor strong {
   font-weight: bold;
   color: inherit;
@@ -147,31 +161,73 @@
 }
 
 .notebook-editor [style*="background-color"] {
-  background-color: #ffeb3b !important;
+  background-color: #ff0000 !important; /* Red highlight */
   padding: 0 2px;
   color: inherit;
 }
 
-/* Ensure formatting buttons are visible */
-.formatting-toolbar .format-btn {
-  width: 32px;
-  height: 32px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: white;
-  border: 1px solid #dee2e6;
-  border-radius: 4px;
-  cursor: pointer;
-  font-weight: bold;
-  transition: all 0.2s ease;
-  color: #333 !important; /* Force button text color */
-  font-size: 1rem !important; /* Force button text size */
-  line-height: 1; /* Adjust line height for better centering */
-  text-align: center; /* Center the text */
+/* Explicit font sizes for <font size="X"> tags */
+.notebook-editor font[size="1"] {
+  font-size: 0.7rem !important;
+}
+.notebook-editor font[size="2"] {
+  font-size: 0.9rem !important;
+}
+.notebook-editor font[size="3"] {
+  font-size: 1.1rem !important;
+}
+.notebook-editor font[size="4"] {
+  font-size: 1.3rem !important;
+}
+.notebook-editor font[size="5"] {
+  font-size: 1.5rem !important;
+}
+.notebook-editor font[size="6"] {
+  font-size: 1.8rem !important;
+}
+.notebook-editor font[size="7"] {
+  font-size: 2.1rem !important;
 }
 
-.formatting-toolbar .format-btn:hover {
-  background: #e9ecef;
-  transform: translateY(-1px);
+.forge-book-toggle {
+  position: fixed;
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  background-color: #333333; /* Dark grey toggle button */
+  color: #ffffff;
+  border: none;
+  padding: 10px 15px 10px 5px;
+  cursor: pointer;
+  z-index: 1001; /* Above the menu */
+  border-radius: 5px 0 0 5px;
+  font-size: 1.5rem;
+  transition: right 0.3s ease;
+}
+
+.forge-book-toggle.forge-book-open {
+  right: 350px; /* Move toggle button with the menu */
+}
+
+.font-size-select {
+  padding: 5px 8px;
+  border: 1px solid #555555;
+  border-radius: 4px;
+  background-color: #333333; /* Dark grey background for select */
+  color: #ffffff; /* White text */
+  cursor: pointer;
+  font-size: 0.9rem;
+  height: 32px; /* Match height of buttons */
+  appearance: none; /* Remove default browser styling */
+  background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E"); /* White arrow */
+  background-repeat: no-repeat;
+  background-position: right 8px center;
+  background-size: 12px;
+  padding-right: 25px; /* Make space for the arrow */
+}
+
+.font-size-select:focus {
+  outline: none;
+  border-color: #ff0000;
+  box-shadow: 0 0 0 0.2rem rgba(255, 0, 0, 0.25);
 }

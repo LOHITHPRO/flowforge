@@ -1,10 +1,14 @@
 body {
-    background-color: #1e1e2f;
-    color: #fff;
+    background-color: #000000; /* Black background */
+    color: #ffffff; /* White text */
     font-family: monospace; /* Set font to monospace */
     font-style: italic;   /* Set font style to italic */
     margin: 0; /* Remove default body margin */
     padding: 0; /* Remove default body padding */
+  }
+  
+  a {
+    color: #ff0000; /* Red for links */
   }
   
   canvas {
@@ -14,5 +18,66 @@ body {
   .main-content {
     /* Removed margin-left as the menu will now overlay */
     padding-top: 56px; /* Adjust based on Header height if fixed-top */
+  }
+  
+  /* Drawing Control Styles (New) */
+  .control-group {
+    margin-bottom: 1rem;
+  }
+  
+  .control-group label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: bold;
+    color: #ffffff; /* White labels */
+  }
+  
+  .btn-group .btn {
+    flex-grow: 1;
+    background-color: #333333; /* Dark grey for inactive buttons */
+    color: #ffffff;
+    border-color: #555555;
+    transition: all 0.2s ease;
+  }
+  
+  .btn-group .btn:hover {
+    background-color: #555555;
+  }
+  
+  .btn-group .btn.active {
+    background-color: #ff0000; /* Red for active buttons */
+    border-color: #ff0000;
+    color: #ffffff;
+    font-weight: bold;
+  }
+  
+  .input-group .form-control {
+    background-color: #333333;
+    color: #ffffff;
+    border-color: #555555;
+    text-align: center;
+  }
+  
+  .input-group .btn {
+    background-color: #333333;
+    color: #ffffff;
+    border-color: #555555;
+  }
+  
+  .input-group .btn:hover {
+    background-color: #555555;
+  }
+  
+  .form-control-color {
+    height: calc(1.5em + 0.75rem + 2px); /* Standard input height */
+    padding: 0.25rem;
+  }
+  
+  .form-control-color::-webkit-color-swatch-wrapper {
+    padding: 0;
+  }
+  
+  .form-control-color::-webkit-color-swatch {
+    border: none;
   }
   
