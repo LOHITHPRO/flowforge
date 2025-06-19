@@ -31,6 +31,14 @@ const Draw = () => {
     height: Math.floor(window.innerHeight * 0.75),
   });
 
+  // Node and connection states
+  const [nodes, setNodes] = useState([]);
+  const [connections, setConnections] = useState([]);
+  const [isCreatingNode, setIsCreatingNode] = useState(false);
+  const [draggedNodeId, setDraggedNodeId] = useState(null);
+  const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 });
+  const [connectingNodeId, setConnectingNodeId] = useState(null);
+
   // Initialize canvas
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -74,6 +82,12 @@ const Draw = () => {
       ctxRef.current.lineWidth = penSize;
     }
   }, [penColor, penSize]);
+
+  // Redraw canvas whenever images, selection, or canvasDims change
+  useEffect(() => {
+    redrawCanvas();
+    // eslint-disable-next-line
+  }, [images, selectedImage, canvasDims]);
 
   // Drawing functions
   const startDraw = (e) => {
@@ -163,7 +177,7 @@ const Draw = () => {
 
     const reader = new FileReader();
     reader.onload = (e) => {
-      const img = new Image();
+      const img = new window.Image();
       img.onload = () => {
         const maxWidth = canvasDims.width * 0.8;
         const maxHeight = canvasDims.height * 0.8;
@@ -189,12 +203,10 @@ const Draw = () => {
           rotation: 0,
         };
 
-        // Cache the image
+        // Cache the image and then update state
         imageCacheRef.current.set(newImage.id, img);
-        
         setImages(prev => [...prev, newImage]);
         setSelectedImage(newImage.id);
-        redrawCanvas();
       };
       img.src = e.target.result;
     };
@@ -257,69 +269,55 @@ const Draw = () => {
     });
   };
 
-  const handleCanvasClick = (e) => {
-    const rect = canvasRef.current.getBoundingClientRect();
-    const scaleX = canvasRef.current.width / rect.width;
-    const scaleY = canvasRef.current.height / rect.height;
-    
-    const x = (e.clientX - rect.left) * scaleX;
-    const y = (e.clientY - rect.top) * scaleY;
-    
-    let clickedOnImage = false;
-
-    // Check if clicked on an image
-    images.forEach(imgData => {
+  // Helper: check if point is inside an image
+  const getImageAtPoint = (x, y) => {
+    for (let i = images.length - 1; i >= 0; i--) { // topmost first
+      const imgData = images[i];
       const dx = x - (imgData.x + imgData.width / 2);
       const dy = y - (imgData.y + imgData.height / 2);
       const rotatedX = dx * Math.cos(-imgData.rotation * Math.PI / 180) - dy * Math.sin(-imgData.rotation * Math.PI / 180);
       const rotatedY = dx * Math.sin(-imgData.rotation * Math.PI / 180) + dy * Math.cos(-imgData.rotation * Math.PI / 180);
-
       if (Math.abs(rotatedX) < imgData.width / 2 && Math.abs(rotatedY) < imgData.height / 2) {
-        clickedOnImage = true;
-        setSelectedImage(imgData.id);
+        return imgData;
       }
-    });
-
-    if (!clickedOnImage) {
-      setSelectedImage(null);
-      startDraw(e);
     }
+    return null;
   };
 
-  const handleMouseDown = (e) => {
-    if (!selectedImage) return;
-
+  // Drawing and image manipulation logic
+  const handleCanvasMouseDown = (e) => {
     const rect = canvasRef.current.getBoundingClientRect();
     const scaleX = canvasRef.current.width / rect.width;
     const scaleY = canvasRef.current.height / rect.height;
-    
     const x = (e.clientX - rect.left) * scaleX;
     const y = (e.clientY - rect.top) * scaleY;
-    
-    const selectedImg = images.find(img => img.id === selectedImage);
-    if (!selectedImg) return;
 
-    // Check if clicked on resize handle
-    const handleSize = 8;
-    const handles = [
-      { x: selectedImg.x, y: selectedImg.y },
-      { x: selectedImg.x + selectedImg.width, y: selectedImg.y },
-      { x: selectedImg.x + selectedImg.width, y: selectedImg.y + selectedImg.height },
-      { x: selectedImg.x, y: selectedImg.y + selectedImg.height }
-    ];
-
-    const clickedHandle = handles.findIndex(handle => {
-      const dx = x - handle.x;
-      const dy = y - handle.y;
-      return Math.sqrt(dx * dx + dy * dy) < handleSize;
-    });
-
-    if (clickedHandle !== -1) {
-      setIsResizing(true);
-      setResizeStart({ x, y, handle: clickedHandle });
+    const img = getImageAtPoint(x, y);
+    if (img) {
+      setSelectedImage(img.id);
+      // Check if clicked on resize handle
+      const handleSize = 8;
+      const handles = [
+        { x: img.x, y: img.y },
+        { x: img.x + img.width, y: img.y },
+        { x: img.x + img.width, y: img.y + img.height },
+        { x: img.x, y: img.y + img.height }
+      ];
+      const clickedHandle = handles.findIndex(handle => {
+        const dx = x - handle.x;
+        const dy = y - handle.y;
+        return Math.sqrt(dx * dx + dy * dy) < handleSize;
+      });
+      if (clickedHandle !== -1) {
+        setIsResizing(true);
+        setResizeStart({ x, y, handle: clickedHandle });
+      } else {
+        setIsDragging(true);
+        setDragStart({ x, y });
+      }
     } else {
-      setIsDragging(true);
-      setDragStart({ x, y });
+      setSelectedImage(null);
+      startDraw(e);
     }
   };
 
@@ -356,7 +354,6 @@ const Draw = () => {
         }));
         setDragStart({ x, y });
       }
-      redrawCanvas();
     }
   };
 
@@ -378,45 +375,174 @@ const Draw = () => {
     setImages([]);
     setSelectedImage(null);
     imageCacheRef.current.clear();
+    setNodes([]);
+    setConnections([]);
+  };
+
+  // Handle create node button
+  const handleCreateNodeClick = () => {
+    setIsCreatingNode(true);
+  };
+
+  // Handle placing a node on canvas (use pageX/pageY for absolute positioning)
+  const handleCanvasForNode = (e) => {
+    if (!isCreatingNode) return;
+    const parentRect = e.target.getBoundingClientRect();
+    const x = e.clientX - parentRect.left;
+    const y = e.clientY - parentRect.top;
+    const newNode = {
+      id: Date.now(),
+      x,
+      y,
+      width: 180,
+      height: 100,
+      title: 'Node',
+      context: '',
+    };
+    setNodes(prev => [...prev, newNode]);
+    setIsCreatingNode(false);
+  };
+
+  // Node dragging logic
+  const handleNodeMouseDown = (e, nodeId) => {
+    e.stopPropagation();
+    const node = nodes.find(n => n.id === nodeId);
+    if (!node) return;
+    setDraggedNodeId(nodeId);
+    setDragOffset({
+      x: e.clientX - node.x,
+      y: e.clientY - node.y,
+    });
+    // Add event listeners to document for dragging outside parent
+    document.addEventListener('mousemove', handleNodeMouseMove);
+    document.addEventListener('mouseup', handleNodeMouseUp);
+  };
+
+  const handleNodeMouseMove = (e) => {
+    if (draggedNodeId === null) return;
+    setNodes(prevNodes => prevNodes.map(node => {
+      if (node.id === draggedNodeId) {
+        return {
+          ...node,
+          x: e.clientX - dragOffset.x,
+          y: e.clientY - dragOffset.y,
+        };
+      }
+      return node;
+    }));
+  };
+
+  const handleNodeMouseUp = () => {
+    setDraggedNodeId(null);
+    document.removeEventListener('mousemove', handleNodeMouseMove);
+    document.removeEventListener('mouseup', handleNodeMouseUp);
+  };
+
+  // Node editing
+  const handleNodeTitleChange = (id, value) => {
+    setNodes(prevNodes => prevNodes.map(node => node.id === id ? { ...node, title: value } : node));
+  };
+  const handleNodeContextChange = (id, value) => {
+    setNodes(prevNodes => prevNodes.map(node => node.id === id ? { ...node, context: value } : node));
+  };
+
+  // Connection logic
+  const handleConnectorClick = (nodeId) => {
+    if (connectingNodeId === null) {
+      setConnectingNodeId(nodeId);
+    } else if (connectingNodeId !== nodeId) {
+      setConnections(prev => [...prev, { from: connectingNodeId, to: nodeId }]);
+      setConnectingNodeId(null);
+    } else {
+      setConnectingNodeId(null);
+    }
+  };
+
+  // Delete node and its connections
+  const handleDeleteNode = (nodeId) => {
+    setNodes(prevNodes => prevNodes.filter(node => node.id !== nodeId));
+    setConnections(prevConnections => prevConnections.filter(conn => conn.from !== nodeId && conn.to !== nodeId));
+  };
+
+  // Render connections as SVG lines
+  const renderConnections = () => {
+    return (
+      <svg
+        style={{
+          position: 'absolute',
+          left: 0,
+          top: 0,
+          width: '100%',
+          height: '100%',
+          pointerEvents: 'none',
+          zIndex: 50,
+        }}
+      >
+        {connections.map((conn, idx) => {
+          const fromNode = nodes.find(n => n.id === conn.from);
+          const toNode = nodes.find(n => n.id === conn.to);
+          if (!fromNode || !toNode) return null;
+          const x1 = fromNode.x + fromNode.width / 2;
+          const y1 = fromNode.y + fromNode.height / 2;
+          const x2 = toNode.x + toNode.width / 2;
+          const y2 = toNode.y + toNode.height / 2;
+          return (
+            <line
+              key={idx}
+              x1={x1}
+              y1={y1}
+              x2={x2}
+              y2={y2}
+              stroke="#007bff"
+              strokeWidth={3}
+              markerEnd="url(#arrowhead)"
+            />
+          );
+        })}
+        <defs>
+          <marker id="arrowhead" markerWidth="8" markerHeight="8" refX="8" refY="4" orient="auto" markerUnits="strokeWidth">
+            <path d="M0,0 L8,4 L0,8" fill="#007bff" />
+          </marker>
+        </defs>
+      </svg>
+    );
   };
 
   return (
-    <div className="container-fluid p-4 bg-dark min-vh-100">
+    <div className="container-fluid p-4 bg-dark min-vh-100"
+      onMouseMove={handleNodeMouseMove}
+      onMouseUp={handleNodeMouseUp}
+      onMouseLeave={handleNodeMouseUp}
+    >
       <h3 className="text-white text-center fw-bold font-monospace mb-4">
         <span className="border-bottom border-danger pb-2">FLOW <span className="text-danger">BOARD</span></span>
       </h3>
 
       <div className="d-flex flex-row w-100 gap-4" style={{ minHeight: "80vh" }}>
-        <div className="flex-grow-1 position-relative">
+        <div className="flex-grow-1 position-relative" style={{overflow: 'visible'}}>
           <canvas
             ref={canvasRef}
             width={canvasDims.width}
             height={canvasDims.height}
-            onMouseDown={(e) => {
-              if (!selectedImage) {
-                startDraw(e);
-              } else {
-                handleMouseDown(e);
-              }
-            }}
+            onMouseDown={isCreatingNode ? handleCanvasForNode : handleCanvasMouseDown}
             onMouseMove={(e) => {
               if (isDrawing) {
                 draw(e);
-              } else if (selectedImage) {
+              } else if (selectedImage && (isDragging || isResizing)) {
                 handleMouseMove(e);
               }
             }}
             onMouseUp={(e) => {
               if (isDrawing) {
                 endDraw(e);
-              } else if (selectedImage) {
+              } else if (selectedImage && (isDragging || isResizing)) {
                 handleMouseUp();
               }
             }}
             onMouseLeave={(e) => {
               if (isDrawing) {
                 endDraw(e);
-              } else if (selectedImage) {
+              } else if (selectedImage && (isDragging || isResizing)) {
                 handleMouseUp();
               }
             }}
@@ -424,13 +550,114 @@ const Draw = () => {
               backgroundColor: "#ffffff",
               border: "2px solid #2c2c2c",
               borderRadius: "8px",
-              cursor: isDragging ? "grabbing" : "crosshair",
+              cursor: isCreatingNode ? "crosshair" : isDragging ? "grabbing" : "crosshair",
               display: "block",
               width: "100%",
               height: "100%",
               boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)"
             }}
           />
+          {/* Render connections (lines) here */}
+          {renderConnections()}
+          {/* Render nodes as overlays */}
+          {nodes.map(node => (
+            <div
+              key={node.id}
+              className="node-box"
+              style={{
+                position: 'absolute',
+                left: node.x,
+                top: node.y,
+                width: node.width,
+                height: node.height,
+                background: '#fff',
+                border: connectingNodeId === node.id ? '2px solid #28a745' : '2px solid #007bff',
+                borderRadius: 8,
+                boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
+                zIndex: 100,
+                cursor: draggedNodeId === node.id ? 'grabbing' : 'grab',
+                padding: 8,
+                display: 'flex',
+                flexDirection: 'column',
+                userSelect: 'none',
+                pointerEvents: 'auto',
+              }}
+              onMouseDown={e => handleNodeMouseDown(e, node.id)}
+            >
+              {/* Delete button */}
+              <button
+                style={{
+                  position: 'absolute',
+                  top: -14,
+                  left: -14,
+                  width: 32,
+                  height: 32,
+                  border: 'none',
+                  background: '#dc3545',
+                  color: '#fff',
+                  fontSize: 18,
+                  cursor: 'pointer',
+                  zIndex: 102,
+                  padding: 0,
+                  borderRadius: '50%',
+                  boxShadow: '0 2px 6px rgba(0,0,0,0.18)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  outline: '2px solid #fff',
+                }}
+                title="Delete Node"
+                onClick={e => { e.stopPropagation(); handleDeleteNode(node.id); }}
+              >
+                <i className="fas fa-trash" style={{fontSize: 18, color: '#fff'}} />
+              </button>
+              <input
+                className="form-control form-control-sm mb-1 fw-bold"
+                style={{ border: 'none', borderBottom: '1px solid #007bff', background: 'transparent' }}
+                value={node.title}
+                onChange={e => handleNodeTitleChange(node.id, e.target.value)}
+                placeholder="Node Title"
+                onMouseDown={e => e.stopPropagation()}
+              />
+              <textarea
+                className="form-control form-control-sm"
+                style={{ border: 'none', background: 'transparent', resize: 'none', minHeight: 40 }}
+                value={node.context}
+                onChange={e => handleNodeContextChange(node.id, e.target.value)}
+                placeholder="Context..."
+                onMouseDown={e => e.stopPropagation()}
+              />
+              {/* Connector handle */}
+              <div
+                style={{
+                  position: 'absolute',
+                  right: -12,
+                  top: '50%',
+                  transform: 'translateY(-50%)',
+                  width: 20,
+                  height: 20,
+                  zIndex: 101,
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                }}
+                onClick={e => { e.stopPropagation(); handleConnectorClick(node.id); }}
+                title={connectingNodeId === null ? 'Start connection' : (connectingNodeId === node.id ? 'Cancel connection' : 'Connect to this node')}
+              >
+                <div
+                  style={{
+                    width: 16,
+                    height: 16,
+                    borderRadius: '50%',
+                    background: connectingNodeId === node.id ? '#28a745' : '#007bff',
+                    border: '2px solid #fff',
+                    boxShadow: '0 0 2px #000',
+                  }}
+                />
+              </div>
+            </div>
+          ))}
         </div>
 
         <div style={{
@@ -444,6 +671,14 @@ const Draw = () => {
           gap: "1.5rem",
           boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)"
         }}>
+          <button
+            className="btn btn-success w-100 mb-3"
+            onClick={handleCreateNodeClick}
+            disabled={isCreatingNode}
+          >
+            <i className="fas fa-project-diagram me-2"></i>
+            Create Node
+          </button>
           <div className="control-group">
             <label className="form-label text-white mb-3 fw-bold">Drawing Tools</label>
             <div className="btn-group w-100" role="group">
